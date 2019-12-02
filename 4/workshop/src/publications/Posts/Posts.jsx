@@ -5,38 +5,27 @@ import './Posts.css';
 import Post from './Post/Post';
 import postService from '../../services/post-service';
 
-class Posts extends React.Component {
-  state = {
-    posts: null
-  };
-  textInput = null;
+const Posts = ({ limit }) => {
+  const [posts, setPosts] = React.useState(null);
 
-  componentDidMount() {
-    postService.load(null, this.props.limit).then(posts => {
-      this.setState({ posts });
+  React.useEffect(() => {
+    postService.load(null, limit).then(posts => {
+      setPosts(posts);
     });
-  }
+  }, [limit]);
 
-  inputChangeHandler = (e) => {
-    console.log(e.target.value);
-  }
-
-  render() {
-    const { posts } = this.state;
-
-    return <div>
-      {posts ?
-        <div className="Posts">
-          {posts.map((post) =>
-            <Post key={post._id} imageUrl="/logo192.png" imageAlt="alt" author={post.author.username}>{post.description}</Post>)}
-        </div> : <div>Loading...</div>
-      }
-    </div>
-  }
-}
+  return <div>
+    {posts ?
+      <div className="Posts">
+        {posts.map((post) =>
+          <Post key={post._id} imageUrl="/logo192.png" imageAlt="alt" author={post.author.username}>{post.description}</Post>)}
+      </div> : <div>Loading...</div>
+    }
+  </div>;
+};
 
 Posts.propTypes = {
   limit: PropTypes.number
-}
+};
 
 export default Posts;

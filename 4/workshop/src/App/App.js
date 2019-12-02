@@ -14,13 +14,14 @@ import Login from '../Login/Login';
 import NotFound from '../NotFound/NotFound';
 import Register from '../Register/Register';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+import ProtectedRoute from '../shared/ProtectedRoute/ProtectedRoute';
 import userService from '../services/user-service';
 
 const Profile = React.lazy(() => import('../Profile/Profile'));
 
-function render(title, Cmp, otherProps) {
+function render(title, Cmp, { isLogged, ...otherProps}, isProtected) {
   return function (props) {
-    return <Main title={title} ><Cmp {...props} {...otherProps} /></Main>
+    return !isProtected && !isLogged ? <Main title={title} ><Cmp {...props} {...otherProps} /></Main> : <Redirect to="/" />
   };
 }
 
@@ -50,7 +51,7 @@ class App extends React.Component {
   }
 
   login = (history, data) => {
-    userService.login(data).then(() => {
+    return userService.login(data).then(() => {
       this.setState({ isLogged: true });
       history.push('/');
     });
@@ -71,16 +72,15 @@ class App extends React.Component {
               <Route path="/posts" render={render('Posts', Posts, { isLogged })} />
               <Route path="/post/:id" render={render('Posts', Detail, { isLogged })} />
               <Route path="/logout" render={render('Logout', Logout, { isLogged, logout: this.logout })} />
-              <Route path="/create-posts">
-                <Main title="Create Post"><CreatePost /></Main>
-              </Route>
-              <Route path="/profile">
+              {/* <Route path="/create-posts" exact render={render('Create Post', CreatePost, { isLogged }, true)} />} */}
+              <ProtectedRoute isLogged={isLogged} redirectTo="/" path="/create-posts" exact render={render('Create Post', CreatePost, { isLogged })} />}/>
+              {isLogged && <Route path="/profile">
                 <Main title="Profile">
                   <React.Suspense fallback={<Loader isLoading={true} />}>
                     <Profile></Profile>
                   </React.Suspense>
                 </Main>
-              </Route>
+              </Route>}
               <Route path="/login" render={render('Login', Login, { isLogged, login: this.login })} />
               <Route path="/register" render={render('Register', Register, { isLogged })} />
               <Route path="*">
