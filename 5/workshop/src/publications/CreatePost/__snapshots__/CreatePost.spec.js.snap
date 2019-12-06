@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`checks for html changes 1`] = `
+<div
+  className="CreatePost"
+>
+  <form>
+    <textarea />
+    <button
+      onClick={[Function]}
+      type="button"
+    >
+      Create Post
+    </button>
+  </form>
+  <Posts
+    limit={3}
+  />
+</div>
+`;
